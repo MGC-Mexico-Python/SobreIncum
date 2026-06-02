@@ -45,9 +45,9 @@ class Sobregiros():
                             'month', CURRENT_DATE)
                         - INTERVAL '5 months')
         AND "Sobregiros" = 0
-        AND "Interlocutor" = %s
+        AND "Interlocutor" = :cliente
         ''', 
-        params = (cliente,))
+        params = {'cliente': cliente})
 
         return query
     
@@ -154,13 +154,13 @@ El comportamiento identificado sugiere una dependencia estructural del financiam
             "Mes",
             "Año"
         FROM "Sobregiros"
-        WHERE "Interlocutor" = %s
+        WHERE "Interlocutor" = :cliente
         AND "Fecha" >= (DATE_TRUNC(
                             'month', CURRENT_DATE)
                         - INTERVAL '5 months')
         ORDER BY "Fecha"
         ''',
-        params = (cliente,),
+        params = {'cliente': cliente},
         parse_dates = 'Fecha')
 
         analisis = self._analisis_cliente(query, cliente)
@@ -168,6 +168,9 @@ El comportamiento identificado sugiere una dependencia estructural del financiam
         if analisis['valido']:
 
             score = self._score_sobregiro(analisis)
+
+        else:
+            score = analisis['mensaje']
 
         return {
             'historial': query,

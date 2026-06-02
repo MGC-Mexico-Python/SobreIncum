@@ -209,6 +209,6 @@ class Calendario:
         diff = np.maximum(diff, 0)
 
         return pd.Series(
-            np.insert(diff, 0, np.nan),
+            np.insert(diff.astype(float), 0, np.nan),
             index=range(len(fechas))
         )
