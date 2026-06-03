@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<section class="tarjetas-cont">
+    <h1 class="encabezado-tarjetas">
+        Sobregiros del día
+    </h1>
+
+    <div class="contenido-tarjetas">
+        {% for item in s.hoy %}
+
+        <a href="{{ url_for('cliente', interlocutor=item.Interlocutor)}}" class="tarjetas">
+            <div class="tarjetas-i">
+                <div class="t-razon">
+                    {{ item["Razon Social"] }}
+                </div>
+
+                <div class="t-interlocutor">
+                    {{ item.Interlocutor }}
+                </div>
+            </div>
+
+            <div class="tarjetas-d">
+                <div class="t-monto">
+                    Sobregiro: {{ item["Money Monto sobregiro"] }}
+                </div>
+            </div>
+        </a>
+        
+        {% endfor %}
+    </div>
+</section>
+
+{% endblock %}
