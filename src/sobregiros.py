@@ -1,6 +1,7 @@
 from mdb import PostgreSQL
 import pandas as pd
 from utils import Calendario
+from utils import money
 
 class Sobregiros():
 
@@ -26,8 +27,13 @@ class Sobregiros():
         AND "Interlocutor" LIKE 'F%'
         AND "Condiciones de pago" <> 'CP00'
         AND "Condiciones de pago" LIKE 'CP%'
-        ''', 
-        output = 'dict')
+        ''')
+
+        query['Money Límite de credito']      = money(query['Límite de credito'])
+        query['Money Importe de la garantía'] = money(query['Importe de la garantía'])
+        query['Money Monto sobregiro']        = money(query['Monto sobregiro'])
+
+        query = query.to_dict(orient = 'records')
 
         return query
     
