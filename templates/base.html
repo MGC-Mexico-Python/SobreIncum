@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+    
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>
+            Crédito y Garantías
+        </title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="/static/css/styles.css">
+    </head>
+
+    <body>
+        <header class="encabezado">
+            <img src="/static/img/logo_MGC.png" alt="Logo MGC" class="logo-img">
+
+            <span class="logo">
+                Crédito y Garantías
+            </span>
+        </header>
+
+        <nav class="categorias" aria-label="Categorias">
+            <a href="#">
+                Sobregiros
+            </a>
+            <a href="#">
+                Incumplimientos
+            </a>
+            <a href="#">
+                Historial
+            </a>
+            <a href="#">
+                Información
+            </a>
+        </nav>
+
+        <main class="contenido">
+            {% block contenido %}
+            {% endblock %}
+        </main>
+    </body>
+
+</html>
