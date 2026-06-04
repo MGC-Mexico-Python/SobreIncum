@@ -13,9 +13,13 @@
     --color-gris-borde: #8b8989;
     --color-gris-texto: #626060;
     --color-negro: #2d2d2d;
+    --color-rojo: #d23939;
 
     --altura-encabezado: 50px;
     --altura-categorias: 40px;
+
+    --radio-tarjeta: 10px;
+    --sombra-tarjeta: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 /* =========================
@@ -43,11 +47,13 @@ body {
    ========================= */
 .contenido {
     flex: 1;
+    min-height: 0;
 
     padding: 10px;
 
     display: flex;
     align-items: stretch;
+    gap: 10px;
 }
 
 /* =========================
@@ -120,12 +126,11 @@ body {
 
     border-radius: 5px;
 
-    transition: 0.2s;
+    transition: background 0.2s, color 0.2s;
 }
 
 .categorias a:hover {
     background: var(--color-blanco);
-
     color: var(--color-negro);
 }
 
@@ -133,7 +138,8 @@ body {
    CONTENEDOR TARJETAS
    ========================= */
 .tarjetas-cont {
-    height: 100%;
+    height: auto;
+    min-height: 0;
     width: 35%;
     min-width: 320px;
 
@@ -144,6 +150,8 @@ body {
 
     display: flex;
     flex-direction: column;
+
+    flex-shrink: 0;
 }
 
 /* =========================
@@ -171,10 +179,9 @@ body {
    ========================= */
 .tarjetas-cont .contenido-tarjetas {
     flex: 1;
+    min-height: 0;
 
     overflow-y: auto;
-
-    font-size: clamp(12px, 0.9vw, 14px);
 
     color: var(--color-negro);
 
@@ -196,7 +203,9 @@ body {
     padding: 10px;
 
     border: 0.5px solid var(--color-gris-borde);
-    border-radius: 10px;
+    border-radius: var(--radio-tarjeta);
+
+    box-shadow: var(--sombra-tarjeta);
 
     display: flex;
     align-items: center;
@@ -205,11 +214,12 @@ body {
 
     color: inherit;
 
-    transition: 0.2s;
+    transition: background 0.2s, box-shadow 0.2s;
 }
 
 .tarjetas-cont .contenido-tarjetas .tarjetas:hover {
     background-color: #d2d2d2;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 }
 
 /* =========================
@@ -253,9 +263,179 @@ body {
 
     font-weight: 700;
 
-    color: #d23939;
+    color: var(--color-rojo);
 }
 
 .tarjetas-cont .contenido-tarjetas .tarjetas .tarjetas-d .t-monto {
     font-size: clamp(15px, 0.9vw, 18px);
+}
+
+/* =========================
+   PANEL DE MÉTRICAS
+   ========================= */
+.panel-metricas {
+    flex: 1;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+
+    gap: 10px;
+
+    align-self: flex-start;
+    height: 30%;
+    min-height: 120px;
+}
+
+/* =========================
+   TARJETA DE MÉTRICA
+   ========================= */
+.metrica-tarjeta {
+    flex: 1;
+    height: 100%;
+
+    border: 1px solid var(--color-gris-borde);
+    border-radius: 15px;
+
+    box-shadow: var(--sombra-tarjeta);
+
+    background-color: var(--metrica-color-fondo, var(--color-blanco));
+
+    border-top: 4px solid var(--metrica-color-acento, var(--color-gris-borde));
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 16px 12px;
+
+    gap: 8px;
+
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.metrica-tarjeta:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.metrica-tarjeta .metrica-titulo {
+    font-size: clamp(11px, 0.75vw, 13px);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    color: var(--metrica-color-titulo, var(--color-gris-texto));
+
+    text-align: center;
+}
+
+.metrica-tarjeta .metrica-valor {
+    font-size: clamp(25px, 1.6vw, 30px);
+    font-weight: 700;
+
+    color: var(--metrica-color-valor, var(--color-negro));
+
+    text-align: center;
+}
+
+/* =========================
+   TARJETA DOBLE (dividida)
+   ========================= */
+.metrica-tarjeta--doble {
+    flex-direction: column;
+
+    padding: 0;
+    gap: 0;
+    overflow: hidden;
+
+    /* Sobreescribe el borde superior de .metrica-tarjeta */
+    border-top: 1px solid var(--color-gris-borde);
+}
+
+.metrica-tarjeta--doble:hover {
+    transform: none;
+    box-shadow: var(--sombra-tarjeta);
+}
+
+/* Título de la tarjeta doble ("Variación diaria") */
+.metrica-doble-titulo {
+    width: 100%;
+
+    padding: 8px 12px;
+
+    background-color: var(--metrica-color-fondo, var(--color-blanco));
+
+    border-bottom: 1px solid var(--color-gris-borde);
+    border-left: 4px solid var(--metrica-color-acento, var(--color-gris-borde));
+
+    font-size: clamp(12px, 0.9vw, 15px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    text-align: center;
+
+    color: var(--metrica-color-acento, var(--color-negro));
+}
+
+/* Contenedor de las dos secciones */
+.metrica-secciones {
+    flex: 1;
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================
+   SECCIÓN DENTRO DE TARJETA DOBLE
+   ========================= */
+.metrica-seccion {
+    flex: 1;
+    width: 100%;
+
+    background-color: var(--seccion-color-fondo, var(--color-blanco));
+
+    border-left: 4px solid var(--seccion-color-acento, var(--color-gris-borde));
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    padding: 10px 12px;
+
+    gap: 4px;
+
+    transition: filter 0.2s;
+}
+
+.metrica-seccion:first-child {
+    border-bottom: 1px solid var(--color-gris-borde);
+}
+
+.metrica-seccion:hover {
+    filter: brightness(0.96);
+}
+
+.metrica-seccion .metrica-titulo {
+    font-size: clamp(11px, 0.75vw, 13px);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    color: var(--seccion-color-titulo, var(--color-gris-texto));
+
+    text-align: center;
+}
+
+.metrica-seccion .metrica-valor {
+    font-size: clamp(25px, 1.4vw, 26px);
+    font-weight: 700;
+
+    color: var(--seccion-color-valor, var(--color-negro));
+
+    text-align: center;
 }

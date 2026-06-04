@@ -9,26 +9,64 @@
     <div class="contenido-tarjetas">
         {% for item in s.hoy %}
 
-        <a href="{{ url_for('cliente', interlocutor=item.Interlocutor)}}" class="tarjetas">
+        <a href="{{ url_for('cliente', interlocutor=item.Interlocutor) }}" class="tarjetas">
             <div class="tarjetas-i">
-                <div class="t-razon">
+                <span class="t-razon">
                     {{ item["Razon Social"] }}
-                </div>
-
-                <div class="t-interlocutor">
+                </span>
+                <span class="t-interlocutor">
                     {{ item.Interlocutor }}
-                </div>
+                </span>
             </div>
 
             <div class="tarjetas-d">
-                <div class="t-monto">
+                <span class="t-monto">
                     Sobregiro: {{ item["Money Monto sobregiro"] }}
-                </div>
+                </span>
             </div>
         </a>
-        
+
         {% endfor %}
     </div>
 </section>
+
+<aside class="panel-metricas">
+
+    <div class="metrica-tarjeta" style="--metrica-color-fondo: #eeeeee; --metrica-color-acento: #323232; --metrica-color-titulo: #626060; --metrica-color-valor: #2d2d2d;">
+        <span class="metrica-titulo">Monto en sobregiro</span>
+        <span class="metrica-valor">{{ s.monto }}</span>
+    </div>
+
+    <div class="metrica-tarjeta" style="--metrica-color-fondo: #eeeeee; --metrica-color-acento: #323232; --metrica-color-titulo: #626060; --metrica-color-valor: #2d2d2d;">
+        <span class="metrica-titulo">Clientes en sobregiro</span>
+        <span class="metrica-valor">{{ s.clientes }}</span>
+    </div>
+
+    <div class="metrica-tarjeta metrica-tarjeta--doble" style="--metrica-color-fondo: #eeeeee; --metrica-color-acento: #323232;">
+
+        <div class="metrica-doble-titulo">
+            Variación diaria
+        </div>
+
+        <div class="metrica-secciones">
+
+            <div class="metrica-seccion" style="--seccion-color-fondo: #eeeeee; --seccion-color-acento: #323232; --seccion-color-titulo: #626060; --seccion-color-valor: #2d2d2d;">
+                <span class="metrica-titulo">Variación clientes</span>
+                <span class="metrica-valor">{{ s.diff_clientes }}</span>
+            </div>
+
+            <div class="metrica-seccion" style="--seccion-color-fondo: #eeeeee; --seccion-color-acento: #323232; --seccion-color-titulo: #626060; --seccion-color-valor: #2d2d2d;">
+                <span class="metrica-titulo">Variación monto</span>
+                <span class="metrica-valor">{{ s.diff_monto }}</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</aside>
+
+<canvas id="grafica-semana-sobregiro"></canvas>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 {% endblock %}
