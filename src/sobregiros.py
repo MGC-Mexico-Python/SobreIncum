@@ -147,10 +147,27 @@ class Sobregiros():
             cliente
             ) -> dict:
         
+        fila_hoy = query[query['Fecha'] == query['Fecha'].max()].iloc[0]
+
+        monto_hoy = fila_hoy['Monto sobregiro']
+        nombre    = fila_hoy['Razon Social']
+        cp        = fila_hoy['Condiciones de pago']
+        limite    = fila_hoy['Límite de credito']
+        garantia  = fila_hoy['Importe de la garantía']
+
+        datos = {
+            'monto': monto_hoy,
+            'nombre': nombre,
+            'cp': cp,
+            'limite': limite,
+            'garantia': garantia
+        }
+        
         if len(query) <= 3:
             return {
                 'valido':  False,
-                'mensaje': '''El cliente no tiene suficientes datos para un análisis de sus sobregiros.'''
+                'mensaje': '''El cliente no tiene suficientes datos para un análisis de sus sobregiros.''',
+                'datos': datos
             }
         
         sin_s = self._sin_sobregiro_cliente(cliente)
@@ -167,7 +184,8 @@ class Sobregiros():
             'ratio_uso':         round(sin_s['Ratio uso'].mean(), 2),
             'ratio_recurrencia': round(query['Ratio recurrencia'].mean(), 2),
             'ratio_monto':       round(query['Ratio monto'].mean(), 2),
-            'eventos':           len(query)
+            'eventos':           len(query),
+            'datos':             datos
         }
     
     def _score_sobregiro(self, 
@@ -263,8 +281,44 @@ El comportamiento identificado sugiere una dependencia estructural del financiam
         else:
             score = analisis['mensaje']
 
+        query_semanal = query.copy()
+
+        query_semanal['Fecha'] = query_semanal['Fecha'].dt.strftime('%A').str.title()
+
+        query_semanal_monto = query_semanal.groupby(['Fecha'], as_index = False)['Monto sobregiro'].mean()
+
+        query_semanal_eventos = query_semanal.groupby(['Fecha'], as_index = False)['Interlocutor'].count()
+
+        query_mensual = query.copy()
+
+        query_mensual['Fecha'] = query_mensual['Fecha'].dt.strftime('%b').str.title()
+
+        query_mensual_monto = query_mensual.groupby(['Fecha'], as_index = False)['Monto sobregiro'].mean()
+
+        query_mensual_eventos = query_mensual.groupby(['Fecha'], as_index = False)['Interlocutor'].count()
+
         return {
-            'historial': query,
-            'datos': analisis,
-            'mensaje': score
+            'historial'            : query,
+            'graf_mensual_eventos' : query_mensual_eventos,
+            'graf_semanal_eventos' : query_semanal_eventos,
+            'graf_mensual_monto'   : query_mensual_monto,
+            'graf_semanal_monto'   : query_semanal_monto,
+            'datos'                : analisis,
+            'mensaje'              : score
         }
+    
+    def lista_sobregiros(self):
+
+        query = self.conexion.consultar('''
+        SELECT
+            "Interlocutor",
+            "Razon Social"
+        FROM "Sobregiros"
+        WHERE "Fecha" >= (DATE_TRUNC(
+                            'month', CURRENT_DATE)
+                            - INTERVAL '5 months')
+        GROUP BY "Interlocutor", "Razon Social"
+        ''',
+        output= 'dict')
+
+        return query

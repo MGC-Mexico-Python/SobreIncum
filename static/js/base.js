@@ -305,3 +305,78 @@ function crearGraficaLinea({
         plugins: [ChartDataLabels]
     });
 }
+
+/* =========================
+   AUTOCOMPLETE
+   ========================= */
+
+function iniciarBuscador(lista) {
+    const input = document.getElementById('input-buscador');
+    const dropdown = document.getElementById('dropdown-buscador');
+
+    input.addEventListener('input', () => {
+        const valor = input.value.trim().toUpperCase();
+        dropdown.innerHTML = '';
+
+        if (!valor) {
+            const contenedor = document.querySelector('.contenido-tarjetas');
+            if (contenedor.dataset.originalHtml) {
+                contenedor.innerHTML = contenedor.dataset.originalHtml;
+                delete contenedor.dataset.originalHtml;
+            }
+            return;
+        }
+
+        const filtrados = lista.filter(c =>
+            c.Interlocutor.toUpperCase().includes(valor)
+        );
+
+        filtrados.forEach(c => {
+            const li = document.createElement('li');
+            li.textContent = `${c.Interlocutor} — ${c["Razon Social"]}`;
+            li.addEventListener('click', () => {
+                input.value = c.Interlocutor;
+                dropdown.innerHTML = '';
+
+                fetch(`/api/cliente/${c.Interlocutor}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        renderizarTarjetaBuscador(c.Interlocutor, c["Razon Social"], data);
+                    });
+            });
+            dropdown.appendChild(li);
+        });
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.encabezado-buscador')) {
+            dropdown.innerHTML = '';
+        }
+    });
+}
+
+/* =========================
+   TARJETA BUSCADOR
+   ========================= */
+
+function renderizarTarjetaBuscador(interlocutor, razonSocial, data) {
+    const contenedor = document.querySelector('.contenido-tarjetas');
+
+    if (!contenedor.dataset.originalHtml) {
+        contenedor.dataset.originalHtml = contenedor.innerHTML;
+    }
+
+    const monto = data["Money Monto sobregiro"] ?? null;
+
+    contenedor.innerHTML = `
+        <a id="tarjeta-buscador" href="/sobregiros/cliente/${interlocutor}" class="tarjetas">
+            <div class="tarjetas-i">
+                <span class="t-razon">${razonSocial}</span>
+                <span class="t-interlocutor">${interlocutor}</span>
+            </div>
+            <div class="tarjetas-d">
+                <span class="t-monto">${monto ? 'Sobregiro: ' + monto : 'Sin sobregiro hoy'}</span>
+            </div>
+        </a>
+    `;
+}

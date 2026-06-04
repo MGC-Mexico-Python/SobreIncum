@@ -3,9 +3,16 @@
 
 <section class="tarjetas-cont">
 
-    <h1 class="encabezado-tarjetas">
-        Sobregiros del día
-    </h1>
+    <div class="encabezado-tarjetas">
+        <h1 class="encabezado-titulo">
+            Sobregiros del día
+        </h1>
+        
+        <div class="encabezado-buscador">
+            <input type="text" id="input-buscador" placeholder="Buscar Interlocutor...">
+            <ul id="dropdown-buscador"></ul>
+        </div>
+    </div>
 
     <div class="contenido-tarjetas">
 
@@ -123,6 +130,7 @@
 <script>
 
     window.datosSemana = {{ s.semana | tojson }};
+    window.clientesAutocomplete = {{ lista | tojson}};
 
 </script>
 

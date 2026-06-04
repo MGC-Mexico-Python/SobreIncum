@@ -24,3 +24,5 @@ crearGraficaLinea({
 
     usarFormatoMoneda: true
 });
+
+iniciarBuscador(window.clientesAutocomplete)
