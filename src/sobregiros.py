@@ -37,6 +37,91 @@ class Sobregiros():
 
         return query
     
+    def sobregiro_ayer(self):
+
+        query = self.conexion.consultar('''
+        SELECT
+            "Interlocutor",
+            "Razon Social",
+            "Límite de credito",
+            "Importe de la garantía",
+            "Monto sobregiro"
+        FROM "Sobregiros"
+        WHERE "Fecha" = (SELECT
+                            MAX("Fecha")
+                         FROM "Sobregiros"
+                         WHERE "Fecha" < (SELECT
+                                            MAX("Fecha")
+                                          FROM "Sobregiros"))
+        AND "Interlocutor" LIKE 'F%'
+        AND "Condiciones de pago" <> 'CP00'
+        AND "Condiciones de pago" LIKE 'CP%'
+        ''')
+
+        query['Money Límite de credito']      = money(query['Límite de credito'])
+        query['Money Importe de la garantía'] = money(query['Importe de la garantía'])
+        query['Money Monto sobregiro']        = money(query['Monto sobregiro'])
+
+        query = query.to_dict(orient = 'records')
+
+        return query
+
+    def hoy_vs_ayer(self):
+
+        hoy  = pd.DataFrame(self.sobregiro_hoy())
+        ayer = pd.DataFrame(self.sobregiro_ayer())
+
+        hoy_clientes = len(hoy)
+        hoy_monto = money(hoy['Monto sobregiro'].sum())
+
+        diff_clientes = hoy_clientes - len(ayer)
+        diff_montos   = money(hoy['Monto sobregiro'].sum() - ayer['Monto sobregiro'].sum())
+
+        return{
+            'clientes'      : hoy_clientes,
+            'monto'         : hoy_monto,
+            'diff_clientes' : diff_clientes,
+            'diff_monto'    : diff_montos
+        }
+    
+    def sobregiro_semana(self):
+
+        query = self.conexion.consultar('''
+        SELECT
+            "Interlocutor",
+            "Razon Social",
+            "Límite de credito",
+            "Importe de la garantía",
+            "Monto sobregiro",
+            "Fecha"
+        FROM "Sobregiros"
+        WHERE "Fecha" >= DATE_TRUNC('week', CURRENT_DATE)
+        AND "Interlocutor" LIKE 'F%'
+        AND "Condiciones de pago" <> 'CP00'
+        AND "Condiciones de pago" LIKE 'CP%'
+        ''',
+        parse_dates = 'Fecha')
+
+        query['Fecha'] = query['Fecha'].dt.strftime('%A').str.title()
+
+        query = query.groupby(['Fecha'], as_index = False)['Monto sobregiro'].sum()
+
+        dias_orden = {
+            'Lunes': 1, 'Martes': 2, 'Miércoles': 3, 'Jueves': 4, 'Viernes': 5
+        }
+
+        query['Orden'] = query['Fecha'].map(dias_orden)
+
+        query = query.sort_values('Orden').drop('Orden', axis = 1)
+
+        query['Money Monto sobregiro'] = money(query['Monto sobregiro'])
+
+        query['Monto sobregiro'] = round(query['Monto sobregiro'], 2)
+
+        query = query.to_dict(orient = 'records')
+
+        return query
+    
     def _sin_sobregiro_cliente(self, 
                                cliente):
         
