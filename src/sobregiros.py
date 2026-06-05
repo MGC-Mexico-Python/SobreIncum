@@ -192,13 +192,13 @@ class Sobregiros():
                          ) ->  dict:
         
         score = round(
-            (datos['ratio_permanencia'] * 0.50
-            + (1 - datos['ratio_recurrencia']) * 0.30
-            + datos['ratio_monto'] * 20),
+            (datos['ratio_permanencia'] * 0.40
+            + (1 - datos['ratio_recurrencia']) * 0.35
+            + datos['ratio_monto'] * 0.25),
             2
         )
 
-        if score <= 0.30:
+        if score <= 0.40:
             clasificacion = 'Operacional'
 
         elif score <= 0.60:
@@ -211,7 +211,7 @@ class Sobregiros():
             mensaje = f'''<strong>Comportamiento: Operacional</strong>
 
             Los eventos son aislados y muestran recuperación rápida entre episodios. 
-            La permanencia en sobregiro es de {round(datos['ratio_permanencia'] * 100, 1)}% y la intensidad promedio representa {round(datos['ratio_monto'] * 100, 1)}% sobre su línea de crédito.
+            La permanencia en sobregiro es de {round(datos['ratio_permanencia'] * 100, 1)}% y el monto promedio representa {round(datos['ratio_monto'] * 100, 1)}% sobre su línea de crédito.
             
             El comportamiento sugiere tensiones temporales de liquidez sin dependencia continua del financiamiento de corto plazo.'''
 
@@ -219,7 +219,7 @@ class Sobregiros():
             mensaje = f'''<strong>Comportamiento: Estratégico</strong>
 
             Se observan periodos frecuentes de permanencia en sobregiro y una recuperación parcial entre eventos. 
-            La permanencia alcanza {round(datos['ratio_permanencia'] * 100, 1)}% y la intensidad promedio representa {round(datos['ratio_monto'] * 100, 1)}% sobre su línea.
+            La permanencia alcanza {round(datos['ratio_permanencia'] * 100, 1)}% y el monto promedio representa {round(datos['ratio_monto'] * 100, 1)}% sobre su línea de crédito.
             
             Aunque el cliente logra recuperar posición en determinados periodos, existe una dependencia recurrente de liquidez operativa.'''
 
@@ -227,7 +227,7 @@ class Sobregiros():
             mensaje = f'''<strong>Comportamiento: Estructural</strong>
 
             La recuperación operativa entre eventos es limitada y el cliente mantiene una permanencia elevada en sobregiro. 
-            La permanencia alcanza {round(datos['ratio_permanencia'] * 100, 1)}% y el monto promedio representa {round(datos['ratio_monto'] * 100, 1)}% sobre su línea.
+            La permanencia alcanza {round(datos['ratio_permanencia'] * 100, 1)}% y el monto promedio representa {round(datos['ratio_monto'] * 100, 1)}% sobre su línea de crédito.
             
             El perfil refleja una dependencia estructural del financiamiento de corto plazo y un riesgo elevado de sostenibilidad operativa.'''
 
