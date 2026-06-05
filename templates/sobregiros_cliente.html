@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block estilos %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sobregiros_cliente.css') }}">
+{% endblock %}
+
+{% block contenido %}
+
+<section class="cliente-cont">
+
+    <div class="cliente-barra">
+
+        <div class="cliente-dato">
+            <span class="cliente-valor">{{ s.Interlocutor }}</span>
+            <span class="cliente-titulo">Interlocutor</span>
+        </div>
+
+        <div class="cliente-dato">
+            <span class="cliente-valor">{{ s.datos.datos.nombre }}</span>
+            <span class="cliente-titulo">Razón Social</span>
+        </div>
+
+        <div class="cliente-dato">
+            <span class="cliente-valor">{{ s.datos.datos.cp }}</span>
+            <span class="cliente-titulo">Condición de pago</span>
+        </div>
+
+        <div class="cliente-dato">
+            <span class="cliente-valor">{{ s.datos.datos.limite }}</span>
+            <span class="cliente-titulo">Límite de crédito</span>
+        </div>
+
+        <div class="cliente-dato">
+            <span class="cliente-valor">{{ s.datos.datos.garantia }}</span>
+            <span class="cliente-titulo">Garantía</span>
+        </div>
+
+    </div>
+
+    <div class="cliente-grafica">
+
+    <div class="cliente-grafica-controles">
+
+        <div class="toggle-tipo">
+            <button class="toggle-tipo-btn activo" id="btn-monto">Monto</button>
+            <button class="toggle-tipo-btn" id="btn-evento">Evento</button>
+        </div>
+
+        <button class="temp-btn" id="btn-temporalidad">Meses &#8594;</button>
+
+    </div>
+
+    <div class="cliente-grafica-canvas">
+        <canvas id="grafica-cliente"></canvas>
+    </div>
+
+</div>
+
+</section>
+
+<script>
+    window.grafSemanalMonto   = {{ s.graf_semanal_monto.to_json(orient='records') | safe }};
+    window.grafSemanalEventos = {{ s.graf_semanal_eventos.to_json(orient='records') | safe }};
+    window.grafMensualMonto   = {{ s.graf_mensual_monto.to_json(orient='records') | safe }};
+    window.grafMensualEventos = {{ s.graf_mensual_eventos.to_json(orient='records') | safe }};
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+<script src="{{ url_for('static', filename='js/base.js') }}"></script>
+<script src="{{ url_for('static', filename='js/sobregiros_cliente.js') }}"></script>
+
+{% endblock %}

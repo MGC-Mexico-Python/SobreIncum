@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 
 from src import Sobregiros
 from mdb import PostgreSQL
@@ -37,16 +37,32 @@ def sobregiros():
         'diff_clientes' : tarjetas['diff_clientes'],
         'semana'        : sobregiro.sobregiro_semana()
     }
+    clientes = sobregiro.lista_sobregiros()
 
     return render_template(
         'sobregiros.html',
-        s = s
+        s = s,
+        lista = clientes
     )
 
-@app.route('/cliente/<interlocutor>')
+@app.route('/sobregiros/cliente/<interlocutor>')
 def cliente(interlocutor):
 
-    return f'Cliente: {interlocutor}'
+    cliente_s = sobregiro.sobregiro_cliente(interlocutor)
+
+    cliente_s['Interlocutor'] = interlocutor
+
+    return render_template(
+        'sobregiros_cliente.html',
+        s = cliente_s
+    )
+
+@app.route('/api/cliente/<interlocutor>')
+def api_cliente(interlocutor):
+    datos_hoy = sobregiro.sobregiro_hoy()
+    resultado = [r for r in datos_hoy if r.get('Interlocutor') == interlocutor]
+    return jsonify(resultado if resultado else {})
+
 
 if __name__ == '__main__':
 

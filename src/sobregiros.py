@@ -152,8 +152,8 @@ class Sobregiros():
         monto_hoy = fila_hoy['Monto sobregiro']
         nombre    = fila_hoy['Razon Social']
         cp        = fila_hoy['Condiciones de pago']
-        limite    = fila_hoy['Límite de credito']
-        garantia  = fila_hoy['Importe de la garantía']
+        limite    = money(fila_hoy['Límite de credito'])
+        garantia  = money(fila_hoy['Importe de la garantía'])
 
         datos = {
             'monto': monto_hoy,
@@ -283,19 +283,39 @@ El comportamiento identificado sugiere una dependencia estructural del financiam
 
         query_semanal = query.copy()
 
+        # Query semanal
+
+        dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes']
+
         query_semanal['Fecha'] = query_semanal['Fecha'].dt.strftime('%A').str.title()
 
-        query_semanal_monto = query_semanal.groupby(['Fecha'], as_index = False)['Monto sobregiro'].mean()
+        query_semanal_monto = query_semanal.groupby(
+            ['Fecha'])['Monto sobregiro'].mean().reindex(dias, fill_value= 0).reset_index()
 
-        query_semanal_eventos = query_semanal.groupby(['Fecha'], as_index = False)['Interlocutor'].count()
+        query_semanal_eventos = query_semanal.groupby(
+            ['Fecha'])['Interlocutor'].count().reindex(dias, fill_value= 0).reset_index()
+
+        #Query mensual
+
+        meses = []
+
+        fecha_actual = pd.to_datetime('today')
+
+        for i in range(5, -1, -1):
+
+            fecha = fecha_actual - pd.DateOffset(months= i)
+
+            meses.append(fecha.strftime('%B').title())
 
         query_mensual = query.copy()
 
-        query_mensual['Fecha'] = query_mensual['Fecha'].dt.strftime('%b').str.title()
+        query_mensual['Fecha'] = query_mensual['Fecha'].dt.strftime('%B').str.title()
+        
+        query_mensual_monto = query_mensual.groupby(
+            ['Fecha'])['Monto sobregiro'].mean().reindex(meses, fill_value=0).reset_index()
 
-        query_mensual_monto = query_mensual.groupby(['Fecha'], as_index = False)['Monto sobregiro'].mean()
-
-        query_mensual_eventos = query_mensual.groupby(['Fecha'], as_index = False)['Interlocutor'].count()
+        query_mensual_eventos = query_mensual.groupby(
+            ['Fecha'])['Interlocutor'].count().reindex(meses, fill_value=0).reset_index()
 
         return {
             'historial'            : query,
@@ -317,6 +337,9 @@ El comportamiento identificado sugiere una dependencia estructural del financiam
         WHERE "Fecha" >= (DATE_TRUNC(
                             'month', CURRENT_DATE)
                             - INTERVAL '5 months')
+        AND "Interlocutor" LIKE 'F%'
+        AND "Condiciones de pago" LIKE 'CP%'
+        AND "Condiciones de pago" <> 'CP00'
         GROUP BY "Interlocutor", "Razon Social"
         ''',
         output= 'dict')
