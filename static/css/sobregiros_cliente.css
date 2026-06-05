@@ -197,3 +197,93 @@
     width: 100% !important;
     height: 100% !important;
 }
+
+/* =========================
+   CONTENIDO
+   ========================= */
+.cliente-contenido {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+/* =========================
+   LATERAL
+   ========================= */
+.cliente-lateral {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+/* =========================
+   MÉTRICA
+   ========================= */
+.cliente-metrica {
+    border: 1px solid var(--color-gris-borde);
+    border-radius: 15px;
+
+    box-shadow: var(--sombra-tarjeta);
+
+    padding: 16px 20px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 4px;
+}
+
+.cliente-metrica .cliente-metrica-valor {
+    font-size: clamp(25px, 1.6vw, 30px);
+    font-weight: 700;
+
+    color: var(--color-rojo);
+
+    text-align: center;
+}
+
+.cliente-metrica .cliente-metrica-titulo {
+    font-size: clamp(10px, 0.7vw, 12px);
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    color: var(--color-gris-texto);
+
+    text-align: center;
+}
+
+/* =========================
+   MENSAJE
+   ========================= */
+.cliente-mensaje {
+    flex: 1;
+
+    border: 1px solid var(--color-gris-borde);
+    border-radius: 15px;
+
+    box-shadow: var(--sombra-tarjeta);
+
+    padding: 5px;
+
+    font-size: clamp(13px, 0.9vw, 16px);
+    font-weight: 500;
+
+    color: var(--color-negro);
+
+    line-height: 1.2;
+
+    white-space: pre-line;
+
+    overflow-y: auto;
+}
+
+.cliente-mensaje p {
+    margin: 0;
+}

@@ -149,7 +149,7 @@ class Sobregiros():
         
         fila_hoy = query[query['Fecha'] == query['Fecha'].max()].iloc[0]
 
-        monto_hoy = fila_hoy['Monto sobregiro']
+        monto_hoy = money(fila_hoy['Monto sobregiro'] if fila_hoy['Fecha'].normalize() == pd.Timestamp.today().normalize() else 0)
         nombre    = fila_hoy['Razon Social']
         cp        = fila_hoy['Condiciones de pago']
         limite    = money(fila_hoy['Límite de credito'])
@@ -167,21 +167,20 @@ class Sobregiros():
             return {
                 'valido':  False,
                 'mensaje': '''El cliente no tiene suficientes datos para un análisis de sus sobregiros.''',
+                'eventos': len(query),
                 'datos': datos
             }
         
-        sin_s = self._sin_sobregiro_cliente(cliente)
-        
         query['Condiciones de pago'] = pd.to_numeric(query['Condiciones de pago'].str[2:])
         query['Dias sin sobregiro'] =  Calendario.diferencia_habil(query['Fecha'])
-
-        sin_s['Ratio uso'] =         round(sin_s['Saldo'] / sin_s['Límite de credito'], 2)
+        
         query['Ratio recurrencia'] = round(query['Dias sin sobregiro'] / query['Condiciones de pago'], 2).clip(upper = 1)
         query['Ratio monto'] =       round(query['Monto sobregiro'] / query['Límite de credito'], 2)
+        
 
         return {
             'valido':            True,
-            'ratio_uso':         round(sin_s['Ratio uso'].mean(), 2),
+            'ratio_permanencia': (query['Dias sin sobregiro'] == 0).sum() / len(query),
             'ratio_recurrencia': round(query['Ratio recurrencia'].mean(), 2),
             'ratio_monto':       round(query['Ratio monto'].mean(), 2),
             'eventos':           len(query),
@@ -193,58 +192,48 @@ class Sobregiros():
                          ) ->  dict:
         
         score = round(
-            (datos['ratio_uso']
-            + (1 - datos['ratio_recurrencia'])
-            + datos['ratio_monto']) / 3,
+            (datos['ratio_permanencia'] * 0.50
+            + (1 - datos['ratio_recurrencia']) * 0.30
+            + datos['ratio_monto'] * 20),
             2
         )
 
-        if score <= 0.35:
+        if score <= 0.30:
             clasificacion = 'Operacional'
 
-        elif score <= 0.65:
+        elif score <= 0.60:
             clasificacion = 'Estratégico'
 
         else:
             clasificacion = 'Estructural'
 
         if clasificacion == 'Operacional':
+            mensaje = f'''<strong>Comportamiento: Operacional</strong>
 
-            mensaje = f'''
-El cliente presenta un comportamiento operacional de sobregiros.
+            Los eventos son aislados y muestran recuperación rápida entre episodios. 
+            La permanencia en sobregiro es de {round(datos['ratio_permanencia'] * 100, 1)}% y la intensidad promedio representa {round(datos['ratio_monto'] * 100, 1)}% sobre su línea de crédito.
+            
+            El comportamiento sugiere tensiones temporales de liquidez sin dependencia continua del financiamiento de corto plazo.'''
 
-Los eventos observados parecen ser aislados y de baja recurrencia operativa. 
-El cliente mantiene periodos saludables entre sobregiros, con un ratio promedio de recurrencia de {datos['ratio_recurrencia']}, lo que indica capacidad de recuperación dentro de sus ciclos normales de operación.
-
-Adicionalmente, el nivel promedio de sobregiro representa {round(datos['ratio_monto'] * 100, 1)}% de su línea de crédito, mientras que el uso promedio de línea se mantiene en {round(datos['ratio_uso'] * 100, 1)}%.
-
-El comportamiento observado sugiere tensiones temporales de liquidez más que una dependencia estructural del financiamiento.
-'''
         elif clasificacion == 'Estratégico':
+            mensaje = f'''<strong>Comportamiento: Estratégico</strong>
 
-            mensaje = f'''
-El cliente presenta un comportamiento estratégico de sobregiros.
+            Se observan periodos frecuentes de permanencia en sobregiro y una recuperación parcial entre eventos. 
+            La permanencia alcanza {round(datos['ratio_permanencia'] * 100, 1)}% y la intensidad promedio representa {round(datos['ratio_monto'] * 100, 1)}% sobre su línea.
+            
+            Aunque el cliente logra recuperar posición en determinados periodos, existe una dependencia recurrente de liquidez operativa.'''
 
-Se observa una recurrencia moderada en los eventos de sobregiro, con un ratio promedio de recurrencia de {datos['ratio_recurrencia']}, lo que sugiere que el cliente incorpora parcialmente el uso de sobregiros dentro de su dinámica operativa habitual.
-
-El monto promedio de sobregiro equivale al {round(datos['ratio_monto'] * 100, 1)}% de su línea de crédito, mientras que el uso promedio de línea alcanza {round(datos['ratio_uso'] * 100, 1)}%.
-
-Aunque el cliente logra recuperar posición entre eventos, la frecuencia observada refleja una dependencia recurrente de liquidez que debe mantenerse bajo monitoreo.
-'''
         else:
+            mensaje = f'''<strong>Comportamiento: Estructural</strong>
 
-            mensaje = f'''
-El cliente presenta un comportamiento estructural de sobregiros.
+            La recuperación operativa entre eventos es limitada y el cliente mantiene una permanencia elevada en sobregiro. 
+            La permanencia alcanza {round(datos['ratio_permanencia'] * 100, 1)}% y el monto promedio representa {round(datos['ratio_monto'] * 100, 1)}% sobre su línea.
+            
+            El perfil refleja una dependencia estructural del financiamiento de corto plazo y un riesgo elevado de sostenibilidad operativa.'''
 
-La recurrencia observada indica una recuperación limitada entre eventos, con un ratio promedio de recurrencia de {datos['ratio_recurrencia']}, reflejando una exposición prácticamente continua a sobregiros.
-
-Asimismo, el monto promedio de sobregiro representa {round(datos['ratio_monto'] * 100, 1)}% de la línea de crédito autorizada y el uso promedio de línea alcanza {round(datos['ratio_uso'] * 100, 1)}%, evidenciando una presión financiera sostenida.
-
-El comportamiento identificado sugiere una dependencia estructural del financiamiento de corto plazo y un perfil de riesgo elevado en términos de liquidez operativa.
-'''
         return {
             'clasificación': clasificacion,
-            'mensaje': mensaje
+            'mensaje': mensaje.strip()
         }
         
     def sobregiro_cliente(self,
@@ -274,7 +263,7 @@ El comportamiento identificado sugiere una dependencia estructural del financiam
 
         analisis = self._analisis_cliente(query, cliente)
 
-        if analisis['valido']:
+        if analisis['valido'] == True:
 
             score = self._score_sobregiro(analisis)
 

@@ -37,24 +37,50 @@
 
     </div>
 
-    <div class="cliente-grafica">
+    <div class="cliente-contenido">
 
-    <div class="cliente-grafica-controles">
+        <div class="cliente-grafica">
 
-        <div class="toggle-tipo">
-            <button class="toggle-tipo-btn activo" id="btn-monto">Monto</button>
-            <button class="toggle-tipo-btn" id="btn-evento">Evento</button>
+            <div class="cliente-grafica-controles">
+
+                <div class="toggle-tipo">
+                    <button class="toggle-tipo-btn activo" id="btn-monto">Monto</button>
+                    <button class="toggle-tipo-btn" id="btn-evento">Evento</button>
+                </div>
+
+                <button class="temp-btn" id="btn-temporalidad">Meses &#8594;</button>
+
+            </div>
+
+            <div class="cliente-grafica-canvas">
+                <canvas id="grafica-cliente"></canvas>
+            </div>
+
         </div>
 
-        <button class="temp-btn" id="btn-temporalidad">Meses &#8594;</button>
+        <div class="cliente-lateral">
+
+            <div class="cliente-metrica">
+                <span class="cliente-metrica-valor">{{ s.datos.datos.monto }}</span>
+                <span class="cliente-metrica-titulo">Monto en sobregiro</span>
+            </div>
+
+            <div class="cliente-metrica">
+                <span class="cliente-metrica-valor">{{ s.datos.eventos }}</span>
+                <span class="cliente-metrica-titulo">Eventos de sobregiro</span>
+            </div>
+
+            <div class="cliente-mensaje">
+                {% if s.datos.valido %}
+                    {{ s.mensaje.mensaje | safe }}
+                {% else %}
+                    {{ s.mensaje | safe}}
+                {% endif %}
+            </div>
+
+        </div>
 
     </div>
-
-    <div class="cliente-grafica-canvas">
-        <canvas id="grafica-cliente"></canvas>
-    </div>
-
-</div>
 
 </section>
 
