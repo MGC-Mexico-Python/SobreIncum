@@ -366,7 +366,8 @@ function renderizarTarjetaBuscador(interlocutor, razonSocial, data) {
         contenedor.dataset.originalHtml = contenedor.innerHTML;
     }
 
-    const monto = data["Money Monto sobregiro"] ?? null;
+    const registro = Array.isArray(data) ? data[0] : data;
+    const monto = registro?.["Money Monto sobregiro"] ?? null;
 
     contenedor.innerHTML = `
         <a id="tarjeta-buscador" href="/sobregiros/cliente/${interlocutor}" class="tarjetas">
