@@ -334,3 +334,20 @@ class Sobregiros():
         output= 'dict')
 
         return query
+    
+    def excel_sobregiros(self):
+
+        query = self.conexion.consultar('''
+        SELECT
+            *
+        FROM "Sobregiros"
+        WHERE "Fecha" >= (DATE_TRUNC(
+                            'month', CURRENT_DATE)
+                            - INTERVAL '5 months')
+        AND "Interlocutor" LIKE 'F%'
+        AND "Condiciones de pago" LIKE 'CP%'
+        AND "Condiciones de pago" <> 'CP00'
+        ORDER BY "Fecha", "Interlocutor"
+        ''')
+
+        return query

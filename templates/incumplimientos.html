@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block estilos %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/sobregiros.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/incumplimientos.css') }}">
 {% endblock %}
 {% block contenido %}
 
@@ -8,7 +8,7 @@
 
     <div class="encabezado-tarjetas">
         <h1 class="encabezado-titulo">
-            Sobregiros del día
+            Incumplimientos del día
         </h1>
         
         <div class="encabezado-buscador">
@@ -21,7 +21,7 @@
 
         {% for item in s.hoy %}
 
-        <a href="{{ url_for('cliente', interlocutor=item.Interlocutor) }}" class="tarjetas">
+        <a href="{{ url_for('cliente_incumplimiento', interlocutor=item.Interlocutor) }}" class="tarjetas">
 
             <div class="tarjetas-i">
 
@@ -38,7 +38,7 @@
             <div class="tarjetas-d">
 
                 <span class="t-monto">
-                    Sobregiro: {{ item["Money Monto sobregiro"] }}
+                    Vencimiento: {{ item["Money Monto vencimiento"] }}
                 </span>
 
             </div>
@@ -59,7 +59,7 @@
              style="--metrica-color-fondo: #eeeeee; --metrica-color-acento: #323232; --metrica-color-titulo: #626060; --metrica-color-valor: #2d2d2d;">
 
             <span class="metrica-titulo">
-                Monto en sobregiro
+                Monto en vencimiento
             </span>
 
             <span class="metrica-valor">
@@ -72,7 +72,7 @@
              style="--metrica-color-fondo: #eeeeee; --metrica-color-acento: #323232; --metrica-color-titulo: #626060; --metrica-color-valor: #2d2d2d;">
 
             <span class="metrica-titulo">
-                Clientes en sobregiro
+                Clientes en incumplimiento
             </span>
 
             <span class="metrica-valor">
@@ -128,7 +128,7 @@
 
     <section class="grafica-cont">
 
-        <canvas id="grafica-semana-sobregiro"></canvas>
+        <canvas id="grafica-semana-incumplimiento"></canvas>
 
     </section>
 
@@ -137,7 +137,7 @@
 <script>
 
     window.datosSemana = {{ s.semana | tojson }};
-    window.clientesAutocomplete = {{ lista | tojson}};
+    window.clientesAutocomplete = {{ lista | tojson }};
 
 </script>
 
@@ -147,6 +147,6 @@
 
 <script src="{{ url_for('static', filename='js/base.js') }}"></script>
 
-<script src="{{ url_for('static', filename='js/sobregiros.js') }}"></script>
+<script src="{{ url_for('static', filename='js/incumplimientos.js') }}"></script>
 
 {% endblock %}

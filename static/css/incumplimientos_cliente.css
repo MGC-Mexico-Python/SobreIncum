@@ -1,0 +1,289 @@
+/* =========================
+   CONTENEDOR CLIENTE
+   ========================= */
+.cliente-cont {
+    width: 100%;
+    padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+/* =========================
+   BARRA CLIENTE
+   ========================= */
+.cliente-barra {
+    width: 90%;
+    margin: 0 auto;
+
+    border: 1px solid var(--color-gris-borde);
+    border-radius: 15px;
+
+    box-shadow: var(--sombra-tarjeta);
+
+    padding: 16px 20px;
+
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+
+    gap: 10px;
+}
+
+/* =========================
+   DATO
+   ========================= */
+.cliente-dato {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 4px;
+
+    padding: 0 10px;
+
+    border-right: 1px solid var(--color-gris-borde);
+}
+
+.cliente-dato:last-child {
+    border-right: none;
+}
+
+/* =========================
+   VALOR
+   ========================= */
+.cliente-dato .cliente-valor {
+    font-size: clamp(14px, 1.1vw, 18px);
+    font-weight: 700;
+
+    color: var(--color-negro);
+
+    text-align: center;
+}
+
+/* =========================
+   TÍTULO
+   ========================= */
+.cliente-dato .cliente-titulo {
+    font-size: clamp(10px, 0.7vw, 12px);
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    color: var(--color-gris-texto);
+
+    text-align: center;
+}
+
+/* =========================
+   RECUADRO GRÁFICA
+   ========================= */
+.cliente-grafica {
+    width: 65%;
+
+    border: 1px solid var(--color-gris-borde);
+    border-radius: 15px;
+
+    box-shadow: var(--sombra-tarjeta);
+
+    padding: 16px 20px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+/* =========================
+   CONTROLES
+   ========================= */
+.cliente-grafica-controles {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* =========================
+   TOGGLE TIPO
+   ========================= */
+.toggle-tipo {
+    display: flex;
+    align-items: center;
+
+    border: 1px solid var(--color-gris-borde);
+    border-radius: 8px;
+
+    overflow: hidden;
+}
+
+.toggle-tipo-btn {
+    padding: 6px 16px;
+
+    background: none;
+    border: none;
+    border-right: 1px solid var(--color-gris-borde);
+
+    font-family: 'Raleway', sans-serif;
+    font-size: clamp(11px, 0.75vw, 13px);
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    color: var(--color-gris-texto);
+
+    cursor: pointer;
+
+    transition: background 0.2s, color 0.2s;
+}
+
+.toggle-tipo-btn:last-child {
+    border-right: none;
+}
+
+.toggle-tipo-btn.activo {
+    background: var(--color-negro);
+    color: var(--color-blanco);
+}
+
+.toggle-tipo-btn:hover:not(.activo) {
+    background: var(--color-gris);
+}
+
+/* =========================
+   TOGGLE TEMPORALIDAD
+   ========================= */
+.temp-btn {
+    background: none;
+    border: none;
+
+    padding: 6px 0;
+
+    cursor: pointer;
+
+    font-family: 'Raleway', sans-serif;
+    font-size: clamp(11px, 0.75vw, 13px);
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    color: var(--color-gris-texto);
+
+    text-decoration: none;
+
+    transition: text-decoration 0.2s, color 0.2s;
+}
+
+.temp-btn:hover {
+    text-decoration: underline;
+    color: var(--color-negro);
+}
+/* =========================
+   CANVAS
+   ========================= */
+.cliente-grafica-canvas {
+    flex: 1;
+    min-height: 250px;
+}
+
+.cliente-grafica-canvas canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* =========================
+   CONTENIDO
+   ========================= */
+.cliente-contenido {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+/* =========================
+   LATERAL
+   ========================= */
+.cliente-lateral {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+/* =========================
+   MÉTRICA
+   ========================= */
+.cliente-metrica {
+    border: 1px solid var(--color-gris-borde);
+    border-radius: 15px;
+
+    box-shadow: var(--sombra-tarjeta);
+
+    padding: 16px 20px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 4px;
+}
+
+.cliente-metrica .cliente-metrica-valor {
+    font-size: clamp(25px, 1.6vw, 30px);
+    font-weight: 700;
+
+    color: var(--color-rojo);
+
+    text-align: center;
+}
+
+.cliente-metrica .cliente-metrica-titulo {
+    font-size: clamp(10px, 0.7vw, 12px);
+    font-weight: 600;
+
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    color: var(--color-gris-texto);
+
+    text-align: center;
+}
+
+/* =========================
+   MENSAJE
+   ========================= */
+.cliente-mensaje {
+    flex: 1;
+
+    border: 1px solid var(--color-gris-borde);
+    border-radius: 15px;
+
+    box-shadow: var(--sombra-tarjeta);
+
+    padding: 5px;
+
+    font-size: clamp(13px, 0.9vw, 16px);
+    font-weight: 500;
+
+    color: var(--color-negro);
+
+    line-height: 1.2;
+
+    white-space: pre-line;
+
+    overflow-y: auto;
+}
+
+.cliente-mensaje p {
+    margin: 0;
+}

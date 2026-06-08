@@ -9,10 +9,10 @@ let esSemanas     = true;
    DATOS
    ========================= */
 function obtenerDatos() {
-    if (esMonto && esSemanas)   return { datos: window.grafSemanalMonto,   labelKey: 'Fecha', valorKey: 'Monto sobregiro',  titulo: 'Promedio de montos por día',    esMonto: true  };
-    if (esMonto && !esSemanas)  return { datos: window.grafMensualMonto,   labelKey: 'Fecha', valorKey: 'Monto sobregiro',  titulo: 'Promedio de montos por mes',    esMonto: true  };
-    if (!esMonto && esSemanas)  return { datos: window.grafSemanalEventos, labelKey: 'Fecha', valorKey: 'Interlocutor',     titulo: 'Frecuencia de eventos por día', esMonto: false };
-    if (!esMonto && !esSemanas) return { datos: window.grafMensualEventos, labelKey: 'Fecha', valorKey: 'Interlocutor',     titulo: 'Frecuencia de eventos por mes', esMonto: false };
+    if (esMonto && esSemanas)   return { datos: window.grafSemanalMonto,   labelKey: 'Fecha', valorKey: 'Monto vencimiento',  titulo: 'Monto por semana',   esMonto: true  };
+    if (esMonto && !esSemanas)  return { datos: window.grafMensualMonto,   labelKey: 'Fecha', valorKey: 'Monto vencimiento',  titulo: 'Monto por mes',      esMonto: true  };
+    if (!esMonto && esSemanas)  return { datos: window.grafSemanalEventos, labelKey: 'Fecha', valorKey: 'Interlocutor',     titulo: 'Eventos por semana', esMonto: false };
+    if (!esMonto && !esSemanas) return { datos: window.grafMensualEventos, labelKey: 'Fecha', valorKey: 'Interlocutor',     titulo: 'Eventos por mes',    esMonto: false };
 }
 
 /* =========================
@@ -21,11 +21,6 @@ function obtenerDatos() {
 function renderizarGrafica() {
 
     
-    console.log('renderizarGrafica llamada');
-    console.log('grafSemanalMonto:', window.grafSemanalMonto);
-    console.log('grafSemanalEventos:', window.grafSemanalEventos);
-    console.log('grafMensualMonto:', window.grafMensualMonto);
-    console.log('grafMensualEventos:', window.grafMensualEventos);
 
 
     if (graficaActiva) {

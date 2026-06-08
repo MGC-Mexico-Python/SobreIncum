@@ -6,4 +6,4 @@ __pycache__
 
 #Innecesarios
 *.png
-*.wpy
+*.pyw

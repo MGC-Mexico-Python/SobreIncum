@@ -1,12 +1,12 @@
 /* =========================
-   DATOS SOBREGIROS
+   DATOS INCUMPLIMIENTOS
    ========================= */
 const labelsSemana = window.datosSemana.map(
     item => item.Fecha
 );
 
 const valoresSemana = window.datosSemana.map(
-    item => item['Monto sobregiro']
+    item => item['Monto vencimiento']
 );
 
 /* =========================
@@ -14,23 +14,23 @@ const valoresSemana = window.datosSemana.map(
    ========================= */
 crearGraficaLinea({
 
-    canvasId: 'grafica-semana-sobregiro',
+    canvasId: 'grafica-semana-incumplimiento',
 
     labels: labelsSemana,
 
     valores: valoresSemana,
 
-    titulo: 'Sobregiros en la semana',
+    titulo: 'Incumplimientos en la semana',
 
     usarFormatoMoneda: true
 });
 
 iniciarBuscador(window.clientesAutocomplete, {
-    modulo       : 'sobregiros',
-    apiUrl       : '/api/cliente/',
-    campoMonto   : 'Money Monto sobregiro',
-    etiquetaMonto: 'Sobregiro',
-    rutaCliente  : '/sobregiros/cliente/'
+    modulo       : 'incumplimientos',
+    apiUrl       : '/api/incumplimientos/cliente/',
+    campoMonto   : 'Money Monto vencimiento',
+    etiquetaMonto: 'Vencimiento',
+    rutaCliente  : '/incumplimientos/cliente/'
 });
 
 /* =========================
@@ -43,7 +43,7 @@ if (btnDescargar) {
 
     btnDescargar.addEventListener('click', () => {
 
-        window.location.href = '/api/sobregiros/exportar';
+        window.location.href = '/api/incumplimientos/exportar';
 
     });
 

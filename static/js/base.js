@@ -310,7 +310,20 @@ function crearGraficaLinea({
    AUTOCOMPLETE
    ========================= */
 
-function iniciarBuscador(lista) {
+function iniciarBuscador(lista, contexto) {
+    // contexto = { modulo: 'sobregiros' | 'incumplimientos',
+    //              apiUrl: '/api/cliente/' | '/api/incumplimientos/cliente/',
+    //              campoMonto: 'Money Monto sobregiro' | 'Money Monto vencimiento',
+    //              etiquetaMonto: 'Sobregiro' | 'Vencimiento',
+    //              rutaCliente: '/sobregiros/cliente/' | '/incumplimientos/cliente/' }
+    const ctx = contexto || {
+        modulo       : 'sobregiros',
+        apiUrl       : '/api/cliente/',
+        campoMonto   : 'Money Monto sobregiro',
+        etiquetaMonto: 'Sobregiro',
+        rutaCliente  : '/sobregiros/cliente/'
+    };
+
     const input = document.getElementById('input-buscador');
     const dropdown = document.getElementById('dropdown-buscador');
 
@@ -338,10 +351,10 @@ function iniciarBuscador(lista) {
                 input.value = c.Interlocutor;
                 dropdown.innerHTML = '';
 
-                fetch(`/api/cliente/${c.Interlocutor}`)
+                fetch(`${ctx.apiUrl}${c.Interlocutor}`)
                     .then(res => res.json())
                     .then(data => {
-                        renderizarTarjetaBuscador(c.Interlocutor, c["Razon Social"], data);
+                        renderizarTarjetaBuscador(c.Interlocutor, c["Razon Social"], data, ctx);
                     });
             });
             dropdown.appendChild(li);
@@ -359,7 +372,13 @@ function iniciarBuscador(lista) {
    TARJETA BUSCADOR
    ========================= */
 
-function renderizarTarjetaBuscador(interlocutor, razonSocial, data) {
+function renderizarTarjetaBuscador(interlocutor, razonSocial, data, ctx) {
+    const contexto = ctx || {
+        campoMonto   : 'Money Monto sobregiro',
+        etiquetaMonto: 'Sobregiro',
+        rutaCliente  : '/sobregiros/cliente/'
+    };
+
     const contenedor = document.querySelector('.contenido-tarjetas');
 
     if (!contenedor.dataset.originalHtml) {
@@ -367,16 +386,16 @@ function renderizarTarjetaBuscador(interlocutor, razonSocial, data) {
     }
 
     const registro = Array.isArray(data) ? data[0] : data;
-    const monto = registro?.["Money Monto sobregiro"] ?? null;
+    const monto = registro?.[contexto.campoMonto] ?? null;
 
     contenedor.innerHTML = `
-        <a id="tarjeta-buscador" href="/sobregiros/cliente/${interlocutor}" class="tarjetas">
+        <a id="tarjeta-buscador" href="${contexto.rutaCliente}${interlocutor}" class="tarjetas">
             <div class="tarjetas-i">
                 <span class="t-razon">${razonSocial}</span>
                 <span class="t-interlocutor">${interlocutor}</span>
             </div>
             <div class="tarjetas-d">
-                <span class="t-monto">${monto ? 'Sobregiro: ' + monto : 'Sin sobregiro hoy'}</span>
+                <span class="t-monto">${monto ? contexto.etiquetaMonto + ': ' + monto : 'Sin ' + contexto.etiquetaMonto.toLowerCase() + ' hoy'}</span>
             </div>
         </a>
     `;
