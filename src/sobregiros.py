@@ -150,17 +150,20 @@ class Sobregiros():
         fila_hoy = query[query['Fecha'] == query['Fecha'].max()].iloc[0]
 
         monto_hoy = money(fila_hoy['Monto sobregiro'] if fila_hoy['Fecha'].normalize() == pd.Timestamp.today().normalize() else 0)
-        nombre    = fila_hoy['Razon Social']
-        cp        = fila_hoy['Condiciones de pago']
-        limite    = money(fila_hoy['Límite de credito'])
-        garantia  = money(fila_hoy['Importe de la garantía'])
+
+        hoy = self.datos_hoy(cliente)
+
+        if not hoy:
+            raise ValueError('Fuck')
+        
+        hoy = hoy[0]
 
         datos = {
-            'monto': monto_hoy,
-            'nombre': nombre,
-            'cp': cp,
-            'limite': limite,
-            'garantia': garantia
+            'monto'    : monto_hoy,
+            'nombre'   : hoy['Razon Social'],
+            'cp'       : hoy['Condiciones de pago'],
+            'limite'   : money(hoy['Límite de credito']),
+            'garantia' : money(hoy['Importe de la garantía'])
         }
         
         if len(query) <= 3:
@@ -332,6 +335,28 @@ class Sobregiros():
         GROUP BY "Interlocutor", "Razon Social"
         ''',
         output= 'dict')
+
+        return query
+    
+    def datos_hoy(self, cliente):
+
+        query = self.conexion.consultar('''
+        SELECT
+            "Interlocutor",
+            "Razon Social",
+            "Condiciones de pago",
+            "Límite de credito",
+            "Importe de la garantía"
+        FROM gasolinas
+        WHERE "Fecha" = (
+            SELECT MAX("Fecha")
+            FROM gasolinas
+            WHERE "Interlocutor" = :cliente
+        )
+        AND "Interlocutor" = :cliente 
+        ''', 
+        params = {'cliente': cliente},
+        output = 'dict')
 
         return query
     

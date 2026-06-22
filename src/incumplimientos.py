@@ -145,19 +145,27 @@ class Incumplimientos():
     # ------------------------------------------------------------------
 
     def _analisis_cliente(self,
-                          query: pd.DataFrame
-                          ) -> dict:
+                      query: pd.DataFrame,
+                      cliente
+                      ) -> dict:
 
         fila_hoy = query[query['Fecha'] == query['Fecha'].max()].iloc[0]
 
+        hoy = self.datos_hoy(cliente)
+
+        if not hoy:
+            raise ValueError(f'No se encontraron datos para el cliente {cliente}')
+
+        hoy = hoy[0]
+
         datos = {
-            'nombre'  : fila_hoy['Razon Social'],
-            'cp'      : fila_hoy['Condiciones de pago'],
-            'limite'  : money(fila_hoy['Límite de credito']),
-            'garantia': money(fila_hoy['Importe de la garantía']),
+            'nombre'  : hoy['Razon Social'],
+            'cp'      : hoy['Condiciones de pago'],
+            'limite'  : money(hoy['Límite de credito']),
+            'garantia': money(hoy['Importe de la garantía']),
             'monto'   : money(fila_hoy['Monto vencimiento']
-                              if fila_hoy['Fecha'].normalize() == pd.Timestamp.today().normalize()
-                              else 0)
+                            if fila_hoy['Fecha'].normalize() == pd.Timestamp.today().normalize()
+                            else 0)
         }
 
         if len(query) <= 3:
@@ -220,55 +228,61 @@ class Incumplimientos():
         }
 
     def _score_incumplimiento(self,
-                              analisis: dict
-                              ) -> dict:
+                            analisis: dict
+                            ) -> dict:
 
         score = round(
             (analisis['ratio_tendencia']    * 0.40
-           + analisis['ratio_variacion']    * 0.30
-           + analisis['ratio_concentracion']* 0.30),
+        + analisis['ratio_variacion']    * 0.30
+        + analisis['ratio_concentracion']* 0.30),
             2
         )
 
-        if score < 0.25:
+        if score < 0.35:
             clasificacion = 'Puntual'
-
-        elif score <= 0.55:
+        elif score <= 0.65:
             clasificacion = 'Recurrente'
-
         else:
             clasificacion = 'Crítico'
 
-        tend  = 'creciente' if analisis['ratio_tendencia'] > 0.5 else 'decreciente'
-        conc  = round(analisis['ratio_concentracion'] * 100, 1)
+        tend = 'creciente' if analisis['ratio_tendencia'] > 0.5 else 'decreciente'
+        conc = round(analisis['ratio_concentracion'] * 100, 1)
 
         if clasificacion == 'Puntual':
-            mensaje = f'''<strong>Comportamiento: Puntual</strong>
-
-            Los vencimientos son episodios aislados — presente en {conc}% de los meses analizados — con tendencia {tend} del monto acumulado.
-            El delta entre registros indica que el cliente regulariza su posición con frecuencia.
-
-            El perfil sugiere retrasos puntuales de pago sin una dependencia continua en el incumplimiento.'''
+            mensaje = (
+                f'<strong>Comportamiento: Puntual</strong><br><br>'
+                f'Presente en <strong>{conc}%</strong> de los últimos 6 meses, '
+                f'con monto acumulado <strong>{tend}</strong>.<br><br>'
+                f'Los retrasos son esporádicos y el cliente muestra capacidad de regularizar. '
+                f'No representa un riesgo activo.<br><br>'
+                f'<em>Acción:</em> Monitoreo estándar, sin cambios en condiciones de crédito.'
+            )
 
         elif clasificacion == 'Recurrente':
-            mensaje = f'''<strong>Comportamiento: Recurrente</strong>
-
-            El cliente aparece en {conc}% de los meses analizados con tendencia {tend} del monto acumulado.
-            Se observan periodos de abono pero sin una regularización sostenida.
-
-            El perfil muestra una pauta recurrente de incumplimiento que requiere seguimiento activo.'''
+            mensaje = (
+                f'<strong>Comportamiento: Recurrente</strong><br><br>'
+                f'Presente en <strong>{conc}%</strong> de los últimos 6 meses, '
+                f'con monto acumulado <strong>{tend}</strong>.<br><br>'
+                f'El cliente abona pero no regulariza de forma sostenida, '
+                f'manteniendo deuda vencida activa de manera intermitente.<br><br>'
+                f'<em>Acción:</em> Seguimiento activo. Evaluar si las condiciones de pago '
+                f'siguen siendo adecuadas.'
+            )
 
         else:
-            mensaje = f'''<strong>Comportamiento: Crítico</strong>
-
-            El cliente presenta vencimientos en {conc}% de los meses analizados con tendencia {tend} del monto acumulado.
-            El delta entre registros refleja poca o nula reducción de la deuda vencida entre cortes.
-
-            El perfil refleja un riesgo de cobro elevado y requiere atención inmediata.'''
+            mensaje = (
+                f'<strong>Comportamiento: Crítico</strong><br><br>'
+                f'Presente en <strong>{conc}%</strong> de los últimos 6 meses, '
+                f'con monto acumulado <strong>{tend}</strong>.<br><br>'
+                f'La deuda vencida se acumula sin reducción real entre cortes. '
+                f'El riesgo de recuperación es alto.<br><br>'
+                f'<em>Acción:</em> Escalar a crédito y cobranza de inmediato. '
+                f'Considerar suspensión de crédito hasta regularización comprobable.'
+            )
 
         return {
             'clasificacion': clasificacion,
-            'mensaje'      : mensaje.strip(),
+            'mensaje'      : mensaje,
             'score'        : score
         }
 
@@ -296,7 +310,7 @@ class Incumplimientos():
         params={'cliente': cliente},
         parse_dates='Fecha')
 
-        analisis = self._analisis_cliente(query)
+        analisis = self._analisis_cliente(query, cliente)
 
         if analisis['valido']:
             score = self._score_incumplimiento(analisis)
@@ -354,5 +368,27 @@ class Incumplimientos():
         AND "Condiciones de pago" LIKE 'CP%'
         ORDER BY "Fecha", "Interlocutor"
         ''')
+
+        return query
+    
+    def datos_hoy(self, cliente):
+
+        query = self.conexion.consultar('''
+        SELECT
+            "Interlocutor",
+            "Razon Social",
+            "Condiciones de pago",
+            "Límite de credito",
+            "Importe de la garantía"
+        FROM "Vencimientos"
+        WHERE "Fecha" = (
+            SELECT MAX("Fecha")
+            FROM "Vencimientos"
+            WHERE "Interlocutor" = :cliente
+        )
+        AND "Interlocutor" = :cliente
+        ''',
+        params = {'cliente': cliente},
+        output = 'dict')
 
         return query
