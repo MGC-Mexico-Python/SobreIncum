@@ -75,10 +75,13 @@ class Incumplimientos():
         ayer = pd.DataFrame(self.incumplimiento_ayer())
 
         hoy_clientes = len(hoy)
-        hoy_monto    = money(hoy['Monto vencimiento'].sum())
+        hoy_suma  = hoy['Monto vencimiento'].sum() if not hoy.empty else 0
+        ayer_suma = ayer['Monto vencimiento'].sum() if not ayer.empty else 0
+
+        hoy_monto = money(hoy_suma)
 
         diff_clientes = hoy_clientes - len(ayer)
-        diff_montos   = money(hoy['Monto vencimiento'].sum() - ayer['Monto vencimiento'].sum())
+        diff_montos   = money(hoy_suma - ayer_suma)
 
         return {
             'clientes'      : hoy_clientes,

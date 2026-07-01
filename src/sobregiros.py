@@ -72,10 +72,13 @@ class Sobregiros():
         ayer = pd.DataFrame(self.sobregiro_ayer())
 
         hoy_clientes = len(hoy)
-        hoy_monto = money(hoy['Monto sobregiro'].sum())
+        hoy_suma  = hoy['Monto sobregiro'].sum() if not hoy.empty else 0
+        ayer_suma = ayer['Monto sobregiro'].sum() if not ayer.empty else 0
+
+        hoy_monto = money(hoy_suma)
 
         diff_clientes = hoy_clientes - len(ayer)
-        diff_montos   = money(hoy['Monto sobregiro'].sum() - ayer['Monto sobregiro'].sum())
+        diff_montos   = money(hoy_suma - ayer_suma)
 
         return{
             'clientes'      : hoy_clientes,
@@ -154,7 +157,7 @@ class Sobregiros():
         hoy = self.datos_hoy(cliente)
 
         if not hoy:
-            raise ValueError('Fuck')
+            raise ValueError('Error')
         
         hoy = hoy[0]
 
