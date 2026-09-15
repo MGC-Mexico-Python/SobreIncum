@@ -20,10 +20,10 @@ class Sobregiros():
             "Límite de credito",
             "Importe de la garantía",
             "Monto sobregiro"
-        FROM "Sobregiros"
+        FROM sobregiros
         WHERE "Fecha" = (SELECT
                             MAX("Fecha")
-                         FROM "Sobregiros")
+                         FROM sobregiros)
         AND "Interlocutor" LIKE 'F%'
         AND "Condiciones de pago" <> 'CP00'
         AND "Condiciones de pago" LIKE 'CP%'
@@ -46,13 +46,13 @@ class Sobregiros():
             "Límite de credito",
             "Importe de la garantía",
             "Monto sobregiro"
-        FROM "Sobregiros"
+        FROM sobregiros
         WHERE "Fecha" = (SELECT
                             MAX("Fecha")
-                         FROM "Sobregiros"
+                         FROM sobregiros
                          WHERE "Fecha" < (SELECT
                                             MAX("Fecha")
-                                          FROM "Sobregiros"))
+                                          FROM sobregiros))
         AND "Interlocutor" LIKE 'F%'
         AND "Condiciones de pago" <> 'CP00'
         AND "Condiciones de pago" LIKE 'CP%'
@@ -97,7 +97,7 @@ class Sobregiros():
             "Importe de la garantía",
             "Monto sobregiro",
             "Fecha"
-        FROM "Sobregiros"
+        FROM sobregiros
         WHERE "Fecha" >= DATE_TRUNC('week', CURRENT_DATE)
         AND "Interlocutor" LIKE 'F%'
         AND "Condiciones de pago" <> 'CP00'
@@ -134,7 +134,7 @@ class Sobregiros():
             "Saldo",
             "Límite de credito",
             "Fecha"
-        FROM gasolinas
+        FROM "ReporteGarantias"
         WHERE "Fecha" >= (DATE_TRUNC(
                             'month', CURRENT_DATE)
                         - INTERVAL '5 months')
@@ -257,7 +257,7 @@ class Sobregiros():
             "Fecha",
             "Mes",
             "Año"
-        FROM "Sobregiros"
+        FROM sobregiros
         WHERE "Interlocutor" = :cliente
         AND "Fecha" >= (DATE_TRUNC(
                             'month', CURRENT_DATE)
@@ -328,7 +328,7 @@ class Sobregiros():
         SELECT
             "Interlocutor",
             "Razon Social"
-        FROM "Sobregiros"
+        FROM sobregiros
         WHERE "Fecha" >= (DATE_TRUNC(
                             'month', CURRENT_DATE)
                             - INTERVAL '5 months')
@@ -350,10 +350,10 @@ class Sobregiros():
             "Condiciones de pago",
             "Límite de credito",
             "Importe de la garantía"
-        FROM gasolinas
+        FROM "ReporteGarantias"
         WHERE "Fecha" = (
             SELECT MAX("Fecha")
-            FROM gasolinas
+            FROM "ReporteGarantias"
             WHERE "Interlocutor" = :cliente
         )
         AND "Interlocutor" = :cliente 
@@ -368,7 +368,7 @@ class Sobregiros():
         query = self.conexion.consultar('''
         SELECT
             *
-        FROM "Sobregiros"
+        FROM sobregiros
         WHERE "Fecha" >= (DATE_TRUNC(
                             'month', CURRENT_DATE)
                             - INTERVAL '5 months')

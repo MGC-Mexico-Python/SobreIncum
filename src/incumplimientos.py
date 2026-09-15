@@ -25,10 +25,10 @@ class Incumplimientos():
             "Límite de credito",
             "Importe de la garantía",
             "Monto vencimiento"
-        FROM "Vencimientos"
+        FROM vencimientos
         WHERE "Fecha" = (SELECT
                             MAX("Fecha")
-                         FROM "Vencimientos")
+                         FROM vencimientos)
         AND "Interlocutor" LIKE 'F%'
         AND "Condiciones de pago" LIKE 'CP%'
         ''')
@@ -50,13 +50,13 @@ class Incumplimientos():
             "Límite de credito",
             "Importe de la garantía",
             "Monto vencimiento"
-        FROM "Vencimientos"
+        FROM vencimientos
         WHERE "Fecha" = (SELECT
                             MAX("Fecha")
-                         FROM "Vencimientos"
+                         FROM vencimientos
                          WHERE "Fecha" < (SELECT
                                             MAX("Fecha")
-                                          FROM "Vencimientos"))
+                                          FROM vencimientos))
         AND "Interlocutor" LIKE 'F%'
         AND "Condiciones de pago" LIKE 'CP%'
         ''')
@@ -100,7 +100,7 @@ class Incumplimientos():
             "Importe de la garantía",
             "Monto vencimiento",
             "Fecha"
-        FROM "Vencimientos"
+        FROM vencimientos
         WHERE "Fecha" >= DATE_TRUNC('week', CURRENT_DATE)
         AND "Interlocutor" LIKE 'F%'
         AND "Condiciones de pago" LIKE 'CP%'
@@ -131,7 +131,7 @@ class Incumplimientos():
         SELECT
             "Interlocutor",
             "Razon Social"
-        FROM "Vencimientos"
+        FROM vencimientos
         WHERE "Fecha" >= (DATE_TRUNC(
                             'month', CURRENT_DATE)
                             - INTERVAL '5 months')
@@ -303,7 +303,7 @@ class Incumplimientos():
             "Fecha",
             "Mes",
             "Año"
-        FROM "Vencimientos"
+        FROM vencimientos
         WHERE "Interlocutor" = :cliente
         AND "Fecha" >= (DATE_TRUNC(
                             'month', CURRENT_DATE)
@@ -363,7 +363,7 @@ class Incumplimientos():
         query = self.conexion.consultar('''
         SELECT
             *
-        FROM "Vencimientos"
+        FROM vencimientos
         WHERE "Fecha" >= (DATE_TRUNC(
                             'month', CURRENT_DATE)
                             - INTERVAL '5 months')
@@ -383,10 +383,10 @@ class Incumplimientos():
             "Condiciones de pago",
             "Límite de credito",
             "Importe de la garantía"
-        FROM "Vencimientos"
+        FROM vencimientos
         WHERE "Fecha" = (
             SELECT MAX("Fecha")
-            FROM "Vencimientos"
+            FROM vencimientos
             WHERE "Interlocutor" = :cliente
         )
         AND "Interlocutor" = :cliente
