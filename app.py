@@ -9,10 +9,7 @@ import io
 from dotenv import load_dotenv
 import locale
 
-try:
-    locale.setlocale(locale.LC_TIME, "es_ES.UTF-8")
-except:
-    locale.setlocale(locale.LC_TIME, "spanish")
+locale.setlocale(locale.LC_TIME, "spanish")
 
 load_dotenv()
 

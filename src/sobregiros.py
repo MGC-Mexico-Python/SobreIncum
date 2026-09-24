@@ -320,11 +320,11 @@ class Sobregiros:
         for i in range(11, -1, -1):
             fecha = fecha_actual - pd.DateOffset(months=i)
 
-            meses.append(fecha.strftime("%B").title())
+            meses.append(fecha.strftime("%b").title())
 
         query_mensual = query.copy()
 
-        query_mensual["Fecha"] = query_mensual["Fecha"].dt.strftime("%B").str.title()
+        query_mensual["Fecha"] = query_mensual["Fecha"].dt.strftime("%b").str.title()
 
         query_mensual_monto = (
             query_mensual.groupby(["Fecha"])["Monto sobregiro"]
