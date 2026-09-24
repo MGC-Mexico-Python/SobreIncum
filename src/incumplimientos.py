@@ -352,15 +352,29 @@ class Incumplimientos():
     def excel_incumplimientos(self):
 
         query = self.conexion.consultar('''
-        SELECT
-            *
-        FROM vencimientos
-        WHERE "Fecha" >= (DATE_TRUNC(
-                            'month', CURRENT_DATE)
-                            - INTERVAL '11 months')
-        AND "Interlocutor" LIKE 'F%'
-        AND "Condiciones de pago" LIKE 'CP%'
-        ORDER BY "Fecha", "Interlocutor"
+            SELECT
+                "Fecha",
+                "Mes",
+                "Año",
+                "Central",
+                "Interlocutor",
+                "Razon Social",
+                "Condiciones de pago",
+                "Importe de la garantía",
+                "Límite de credito",
+                "Saldo",
+                "Anticipos",
+                "Saldo vencido",
+                "Monto vencimiento"
+            FROM vencimientos
+            WHERE "Fecha" >= (
+                    DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '11 months'
+                )
+            AND "Interlocutor"       LIKE 'F%'
+            AND "Condiciones de pago" LIKE 'CP%'
+            ORDER BY
+                "Fecha",
+                "Interlocutor"
         ''')
 
         return query

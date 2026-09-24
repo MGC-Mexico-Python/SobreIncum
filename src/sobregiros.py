@@ -401,7 +401,19 @@ class Sobregiros:
 
         query = self.conexion.consultar("""
         SELECT
-            *
+            "Fecha",
+            "Mes",
+            "Año",
+            "Central",
+            "Interlocutor",
+            "Razon Social",
+            "Condiciones de pago",
+            "Importe de la garantía",
+            "Límite de credito",
+            "Saldo",
+            "Anticipos",
+            "Saldo vencido",
+            "Monto sobregiro"
         FROM sobregiros
         WHERE "Fecha" >= (DATE_TRUNC(
                             'month', CURRENT_DATE)
