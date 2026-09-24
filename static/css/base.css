@@ -1,31 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* =========================
-   VARIABLES
-   ========================= */
 :root {
-    --color-blanco: #FFFFFF;
-    --color-gris: #e9e6e6;
-    --color-gris-borde: #8b8989;
-    --color-gris-texto: #626060;
-    --color-negro: #2d2d2d;
-    --color-rojo: #d23939;
-
-    --altura-encabezado: 50px;
+    --altura-encabezado: 52px;
     --altura-categorias: 40px;
-
-    --radio-tarjeta: 10px;
-    --sombra-tarjeta: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-/* =========================
-   HTML / BODY
-   ========================= */
 html,
 body {
     height: 100%;
@@ -34,104 +17,139 @@ body {
 body {
     width: 100%;
     min-height: 100vh;
-
     display: flex;
     flex-direction: column;
-
-    font-family: "Inter", system-ui, sans-serif;
-
-    background: var(--color-blanco);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    color: var(--text-1);
+    background: var(--surface-1);
+    -webkit-font-smoothing: antialiased;
 }
 
-/* =========================
-   MAIN
-   ========================= */
+:focus-visible {
+    outline: 2px solid var(--accent-1);
+    outline-offset: 2px;
+}
+
 .contenido {
     flex: 1;
     min-height: 0;
-
-    padding: 10px;
-
+    padding: 14px;
     display: flex;
-    gap: 10px;
-
+    gap: 14px;
     overflow: hidden;
 }
 
-/* =========================
-   HEADER
-   ========================= */
 .encabezado {
     position: sticky;
     top: 0;
     z-index: 100;
-
     height: var(--altura-encabezado);
     width: 100%;
-
-    background: var(--color-blanco);
-
-    border-bottom: 1px solid var(--color-gris-borde);
-
     padding: 0 2rem;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--surface-5);
 }
 
 .encabezado .logo {
-    font-size: clamp(25px, 2vw, 30px);
-    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-1);
+}
 
-    color: var(--color-negro);
+.encabezado .logo::before {
+    content: "";
+    width: 3px;
+    height: 24px;
+    background: var(--accent-2);
+}
+
+.encabezado-acciones {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 22px;
 }
 
 .encabezado .logo-img {
-    height: 90%;
+    height: 80%;
     width: auto;
 }
 
-/* =========================
-   NAV
-   ========================= */
+.btn-tema {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    background: none;
+    border: 1px solid var(--surface-5);
+    border-radius: var(--radius-tab);
+    color: var(--text-2);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-tema:hover {
+    border-color: var(--accent-2);
+    color: var(--text-1);
+}
+
+[data-theme="dark"] .btn-tema .icono-luna {
+    display: none;
+}
+
+[data-theme="light"] .btn-tema .icono-sol {
+    display: none;
+}
+
 .categorias {
     position: sticky;
     top: var(--altura-encabezado);
     z-index: 99;
-
     width: 100%;
     height: var(--altura-categorias);
-
-    background: var(--color-gris);
-
-    border-bottom: 1px solid var(--color-gris-borde);
-
     padding: 0 2rem;
-
     display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-
+    align-items: flex-end;
     gap: 4px;
+    background: var(--surface-1);
+    border-bottom: 1px solid var(--surface-5);
 }
 
 .categorias a {
-    font-size: clamp(20px, 1vw, 25px);
-    font-weight: 600;
-
-    color: var(--color-gris-texto);
-
+    height: 32px;
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    color: var(--text-3);
     text-decoration: none;
-
-    padding: 4px 10px;
-
-    border-radius: 5px;
-
-    transition: background 0.2s, color 0.2s;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: var(--radius-tab) var(--radius-tab) 0 0;
+    transition: color 0.15s, background 0.15s;
 }
 
 .categorias a:hover {
-    background: var(--color-blanco);
-    color: var(--color-negro);
+    color: var(--text-1);
+    background: var(--surface-2);
+}
+
+.categorias a.activo {
+    color: var(--text-1);
+    background: var(--surface-2);
+    border-color: var(--surface-5);
+    box-shadow: inset 0 2px 0 var(--accent-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
 }

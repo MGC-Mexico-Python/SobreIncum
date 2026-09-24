@@ -65,9 +65,19 @@
                 <span class="cliente-metrica-titulo">Monto en vencimiento</span>
             </div>
 
-            <div class="cliente-metrica">
-                <span class="cliente-metrica-valor">{{ s.datos.eventos }}</span>
-                <span class="cliente-metrica-titulo">Eventos de vencimiento</span>
+            <div class="cliente-metrica cliente-metrica-eventos">
+
+                <div class="cliente-metrica-seccion">
+                    <span class="cliente-metrica-valor">{{ s.datos.eventos }}</span>
+                    <span class="cliente-metrica-titulo">Eventos de vencimiento</span>
+                </div>
+
+                <div class="cliente-metrica-seccion">
+                    <a href="{{ url_for('exportar_incumplimiento_cliente', interlocutor=s.Interlocutor) }}">
+                        Descargar Excel
+                    </a>
+                </div>
+
             </div>
 
             <div class="cliente-mensaje">

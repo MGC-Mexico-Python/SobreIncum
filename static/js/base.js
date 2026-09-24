@@ -3,6 +3,17 @@
    ========================= */
 Chart.register(ChartDataLabels);
 
+function colorTema(nombre) {
+    return getComputedStyle(document.documentElement).getPropertyValue(nombre).trim();
+}
+
+function conAlfa(hex, alfa) {
+    const n = parseInt(hex.replace('#', ''), 16);
+    return `rgba(${n >> 16}, ${(n >> 8) & 255}, ${n & 255}, ${alfa})`;
+}
+
+Chart.defaults.font.family = colorTema('--font-sans');
+
 /* =========================
    FORMATO MONEDA
    ========================= */
@@ -62,9 +73,9 @@ function crearGraficaLinea({
 
     titulo = '',
 
-    colorLinea = '#2d2d2d',
+    colorLinea = colorTema('--accent-2'),
 
-    colorFondo = 'rgba(45, 45, 45, 0.10)',
+    colorFondo = conAlfa(colorTema('--accent-2'), 0.14),
 
     porcentajeTop = 0.15,
 
@@ -154,7 +165,7 @@ function crearGraficaLinea({
 
                 datalabels: {
 
-                    color: '#2d2d2d',
+                    color: colorTema('--text-1'),
 
                     anchor: 'end',
 
@@ -226,7 +237,7 @@ function crearGraficaLinea({
 
                     text: titulo,
 
-                    color: '#2d2d2d',
+                    color: colorTema('--text-1'),
 
                     font: {
 
@@ -270,7 +281,7 @@ function crearGraficaLinea({
 
                     ticks: {
 
-                        color: '#626060',
+                        color: colorTema('--text-2'),
 
                         font: {
 
@@ -341,7 +352,8 @@ function iniciarBuscador(lista, contexto) {
         }
 
         const filtrados = lista.filter(c =>
-            c.Interlocutor.toUpperCase().includes(valor)
+            c.Interlocutor.toUpperCase().includes(valor) ||
+            c["Razon Social"].toUpperCase().includes(valor)
         );
 
         filtrados.forEach(c => {
@@ -399,4 +411,34 @@ function renderizarTarjetaBuscador(interlocutor, razonSocial, data, ctx) {
             </div>
         </a>
     `;
+}
+
+/* =========================
+   TEMA
+   ========================= */
+function recolorearGrafica(grafica) {
+    const linea = colorTema('--accent-2');
+    const dataset = grafica.data.datasets[0];
+    dataset.borderColor = linea;
+    dataset.backgroundColor = conAlfa(linea, 0.14);
+    dataset.datalabels.color = colorTema('--text-1');
+    grafica.options.plugins.title.color = colorTema('--text-1');
+    grafica.options.scales.x.ticks.color = colorTema('--text-2');
+    grafica.update('none');
+}
+
+function aplicarTema(tema) {
+    document.documentElement.dataset.theme = tema;
+    try { localStorage.setItem('tema', tema); } catch (e) {}
+    Object.values(Chart.instances).forEach(recolorearGrafica);
+}
+
+const btnTema = document.getElementById('btn-tema');
+
+if (btnTema) {
+    btnTema.addEventListener('click', () => {
+        aplicarTema(
+            document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'
+        );
+    });
 }

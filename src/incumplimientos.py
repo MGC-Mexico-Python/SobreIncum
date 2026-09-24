@@ -2,6 +2,7 @@ from mdb import PostgreSQL
 import pandas as pd
 from utils import Calendario
 from utils import money
+from utils.cache import cacheado
 
 
 class Incumplimientos():
@@ -12,10 +13,7 @@ class Incumplimientos():
 
         self.conexion = conexion
 
-    # ------------------------------------------------------------------
-    # Dashboard principal
-    # ------------------------------------------------------------------
-
+    @cacheado
     def incumplimiento_hoy(self):
 
         query = self.conexion.consultar('''
@@ -41,6 +39,7 @@ class Incumplimientos():
 
         return query
 
+    @cacheado
     def incumplimiento_ayer(self):
 
         query = self.conexion.consultar('''
@@ -69,6 +68,7 @@ class Incumplimientos():
 
         return query
 
+    @cacheado
     def hoy_vs_ayer(self):
 
         hoy  = pd.DataFrame(self.incumplimiento_hoy())
@@ -90,6 +90,7 @@ class Incumplimientos():
             'diff_monto'    : diff_montos
         }
 
+    @cacheado
     def incumplimiento_semana(self):
 
         query = self.conexion.consultar('''
@@ -125,6 +126,7 @@ class Incumplimientos():
 
         return query
 
+    @cacheado
     def lista_incumplimientos(self):
 
         query = self.conexion.consultar('''
@@ -134,7 +136,7 @@ class Incumplimientos():
         FROM vencimientos
         WHERE "Fecha" >= (DATE_TRUNC(
                             'month', CURRENT_DATE)
-                            - INTERVAL '5 months')
+                            - INTERVAL '11 months')
         AND "Interlocutor" LIKE 'F%'
         AND "Condiciones de pago" LIKE 'CP%'
         GROUP BY "Interlocutor", "Razon Social"
@@ -142,10 +144,6 @@ class Incumplimientos():
         output='dict')
 
         return query
-
-    # ------------------------------------------------------------------
-    # Vista individual — análisis y score
-    # ------------------------------------------------------------------
 
     def _analisis_cliente(self,
                       query: pd.DataFrame,
@@ -181,9 +179,6 @@ class Incumplimientos():
 
         query = query.copy().sort_values('Fecha')
 
-        # --- Tendencia del monto (40%) ---
-        # Promedio de los primeros 2 meses vs últimos 2 meses de la ventana.
-        # Monto acumulado: si sube = más deuda vencida (malo), si baja = pagando (bueno).
         periodos = query['Fecha'].dt.to_period('M').sort_values().unique()
 
         if len(periodos) >= 4:
@@ -198,10 +193,6 @@ class Incumplimientos():
         else:
             ratio_tendencia = 0.5
 
-        # --- Variación entre registros (30%) ---
-        # Delta del monto entre registros consecutivos.
-        # Promedio de deltas positivos (acumula) vs negativos (abona).
-        # Normalizado a [0, 1]: 1 = siempre sube, 0 = siempre baja.
         deltas = query['Monto vencimiento'].diff().dropna()
 
         if len(deltas) > 0:
@@ -215,11 +206,8 @@ class Incumplimientos():
         else:
             ratio_variacion = 0.5
 
-        # --- Concentración mensual (30%) ---
-        # Meses con al menos un registro / 6 meses de ventana.
-        # 6/6 = presente todos los meses (malo), 1/6 = episodio aislado (bueno).
         meses_con_registro = query['Fecha'].dt.to_period('M').nunique()
-        ratio_concentracion = round(meses_con_registro / 6, 2)
+        ratio_concentracion = round(meses_con_registro / 12, 2)
 
         return {
             'valido'             : True,
@@ -254,7 +242,7 @@ class Incumplimientos():
         if clasificacion == 'Puntual':
             mensaje = (
                 f'<strong>Comportamiento: Puntual</strong><br><br>'
-                f'Presente en <strong>{conc}%</strong> de los últimos 6 meses, '
+                f'Presente en <strong>{conc}%</strong> de los últimos 12 meses, '
                 f'con monto acumulado <strong>{tend}</strong>.<br><br>'
                 f'Los retrasos son esporádicos y el cliente muestra capacidad de regularizar. '
                 f'No representa un riesgo activo.<br><br>'
@@ -264,7 +252,7 @@ class Incumplimientos():
         elif clasificacion == 'Recurrente':
             mensaje = (
                 f'<strong>Comportamiento: Recurrente</strong><br><br>'
-                f'Presente en <strong>{conc}%</strong> de los últimos 6 meses, '
+                f'Presente en <strong>{conc}%</strong> de los últimos 12 meses, '
                 f'con monto acumulado <strong>{tend}</strong>.<br><br>'
                 f'El cliente abona pero no regulariza de forma sostenida, '
                 f'manteniendo deuda vencida activa de manera intermitente.<br><br>'
@@ -275,7 +263,7 @@ class Incumplimientos():
         else:
             mensaje = (
                 f'<strong>Comportamiento: Crítico</strong><br><br>'
-                f'Presente en <strong>{conc}%</strong> de los últimos 6 meses, '
+                f'Presente en <strong>{conc}%</strong> de los últimos 12 meses, '
                 f'con monto acumulado <strong>{tend}</strong>.<br><br>'
                 f'La deuda vencida se acumula sin reducción real entre cortes. '
                 f'El riesgo de recuperación es alto.<br><br>'
@@ -289,25 +277,29 @@ class Incumplimientos():
             'score'        : score
         }
 
+    @cacheado
     def incumplimiento_cliente(self, cliente):
 
         query = self.conexion.consultar('''
         SELECT
+            "Fecha",
+            "Mes",
+            "Año",
+            "Central",
             "Interlocutor",
             "Razon Social",
             "Condiciones de pago",
-            "Saldo",
-            "Límite de credito",
             "Importe de la garantía",
-            "Monto vencimiento",
-            "Fecha",
-            "Mes",
-            "Año"
+            "Límite de credito",
+            "Saldo",
+            "Anticipos",
+            "Saldo vencido",
+            "Monto vencimiento"
         FROM vencimientos
         WHERE "Interlocutor" = :cliente
         AND "Fecha" >= (DATE_TRUNC(
                             'month', CURRENT_DATE)
-                        - INTERVAL '5 months')
+                        - INTERVAL '11 months')
         ORDER BY "Fecha"
         ''',
         params={'cliente': cliente},
@@ -320,7 +312,6 @@ class Incumplimientos():
         else:
             score = {'clasificacion': None, 'mensaje': analisis['mensaje'], 'score': None}
 
-        # --- Gráfica semanal ---
         dias          = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes']
         query_semanal = query.copy()
         query_semanal['Fecha'] = query_semanal['Fecha'].dt.strftime('%A').str.title()
@@ -331,11 +322,10 @@ class Incumplimientos():
         graf_semanal_eventos = query_semanal.groupby(
             ['Fecha'])['Interlocutor'].count().reindex(dias, fill_value=0).reset_index()
 
-        # --- Gráfica mensual ---
         meses        = []
         fecha_actual = pd.to_datetime('today')
 
-        for i in range(5, -1, -1):
+        for i in range(11, -1, -1):
             fecha = fecha_actual - pd.DateOffset(months=i)
             meses.append(fecha.strftime('%B').title())
 
@@ -357,7 +347,8 @@ class Incumplimientos():
             'datos'               : analisis,
             'mensaje'             : score
         }
-    
+
+    @cacheado
     def excel_incumplimientos(self):
 
         query = self.conexion.consultar('''
@@ -366,14 +357,14 @@ class Incumplimientos():
         FROM vencimientos
         WHERE "Fecha" >= (DATE_TRUNC(
                             'month', CURRENT_DATE)
-                            - INTERVAL '5 months')
+                            - INTERVAL '11 months')
         AND "Interlocutor" LIKE 'F%'
         AND "Condiciones de pago" LIKE 'CP%'
         ORDER BY "Fecha", "Interlocutor"
         ''')
 
         return query
-    
+
     def datos_hoy(self, cliente):
 
         query = self.conexion.consultar('''

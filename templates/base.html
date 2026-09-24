@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="es">
-    
+<html lang="es" data-theme="dark">
+
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,10 +8,18 @@
             Crédito y Garantías
         </title>
 
+        <script>
+            document.documentElement.dataset.theme = (function () {
+                try { return localStorage.getItem('tema'); } catch (e) { return null; }
+            })() || 'dark';
+        </script>
+
         <link rel="icon" href="{{ url_for('static', filename='img/icon_MGC.ico') }}">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/utilidades.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
         {% block estilos %}
         {% endblock %}
@@ -19,29 +27,26 @@
 
     <body>
         <header class="encabezado">
-            <span class="logo">
+            <span class="logo u-titulo">
                 Crédito y Garantías
             </span>
-            
-            <img src="/static/img/logo_MGC.png" alt="Logo MGC" class="logo-img">
+
+            <div class="encabezado-acciones">
+                <button type="button" id="btn-tema" class="btn-tema" aria-label="Cambiar entre modo claro y oscuro">
+                    <svg class="icono-sol" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+                    <svg class="icono-luna" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+                <img src="/static/img/logo_MGC.png" alt="Logo MGC" class="logo-img">
+            </div>
         </header>
 
         <nav class="categorias" aria-label="Categorias">
-            <a href="{{ url_for('sobregiros') }}">
+            <a href="{{ url_for('sobregiros') }}" class="u-etiqueta{% if request.path.startswith('/sobregiros') %} activo{% endif %}"{% if request.path.startswith('/sobregiros') %} aria-current="page"{% endif %}>
                 Sobregiros
             </a>
-            <a href="{{ url_for('incumplimientos') }}">
+            <a href="{{ url_for('incumplimientos') }}" class="u-etiqueta{% if request.path.startswith('/incumplimientos') %} activo{% endif %}"{% if request.path.startswith('/incumplimientos') %} aria-current="page"{% endif %}>
                 Incumplimientos
             </a>
-            <a href="#">
-                Historial
-            </a>
-            <a href="#">
-                Información
-            </a>
-            <a href="#">
-                Líneas de crédito
-            </a>            
         </nav>
 
         <main class="contenido">
